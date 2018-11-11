@@ -1,0 +1,51 @@
+version: '3.4'
+
+volumes:
+  pgadmindata: {}
+  
+services:
+  cm_tools_pgadmin:
+    image: fenglc/pgadmin4
+    depends_on:
+      - cm_infrastracture_postgres
+    ports:
+      - "5050:5050"
+    environment:
+      - DEFAULT_USER=cm
+      - DEFAULT_PASSWORD=cm
+    volumes:
+      - pgadmindata:/root/.pgadmin
+
+  cm_tools_konga_prepare:
+    image: pantsel/konga:next
+    restart: on-failure
+    depends_on:
+      - cm_infrastracture_postgres
+    command: "-c prepare -a postgres -u postgresql://cm:cm@cm_infrastracture_postgres:5432/cm_tools_kongadb"
+
+  cm_tools_konga:
+    image: pantsel/konga:next
+    restart: always
+    depends_on:
+      - cm_infrastracture_postgres
+      - cm_tools_konga_prepare
+    ports:
+      - "1337:1337"
+    environment:
+      - DB_ADAPTER=postgres
+      - DB_HOST=cm_infrastracture_postgres
+      - DB_USER=cm
+      - DB_PASSWORD=cm
+      - TOKEN_SECRET=km1GUr4RkcQD7DewhJPNXrCuZwcKmqjb
+      - DB_DATABASE=cm_tools_kongadb
+      - NODE_ENV=production
+
+  cm_tools_trifecta:
+    image: chatu/trifecta
+    depends_on:
+      - cm_infrastracture_zookeeper
+      - cm_infrastracture_kafka
+    ports:
+      - "8888:8888"
+    environment:
+      - ZOOKEEPERS=cm_infrastracture_zookeeper

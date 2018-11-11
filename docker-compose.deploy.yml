@@ -1,0 +1,67 @@
+version: '3.4'
+
+services:
+  cm_presentation_web:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cm_services_identity_api:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cm_services_exchange_api:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cm_services_wallet_api:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cm_services_wallet_views_api:
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  cm_infrastracture_sql:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+
+  cm_infrastracture_postgres:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+
+  cm_infrastracture_kong_migration:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+        
+  cm_infrastracture_kong:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+        
+  cm_infrastracture_rabbitmq:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+
+  cm_infrastracture_redis:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+
+  cm_infrastracture_zookeeper:
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+
+  cm_infrastracture_kafka:
+    deploy:
+      placement:
+        constraints: [node.role == worker]

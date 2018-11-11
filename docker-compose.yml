@@ -1,0 +1,88 @@
+version: '3.4'
+
+services:
+  cm_presentation_web:
+    image: ${DOCKER_REGISTRY}cmpresentationweb
+    build:
+      context: .
+      dockerfile: CM.Presentation/CM.Presentation.Web/Dockerfile
+    depends_on:
+      - cm_infrastracture_kong
+      - cm_services_identity_api
+      - cm_services_exchange_api
+      - cm_services_wallet_api
+      - cm_services_wallet_views_api
+
+  cm_services_identity_api:
+    image: ${DOCKER_REGISTRY}cmservicesidentityapi
+    build:
+      context: .
+      dockerfile: CM.Services/CM.Services.Identity/CM.Services.Identity.API/Dockerfile
+    depends_on:
+      - cm_infrastracture_kong
+      - cm_infrastracture_sql
+
+  cm_services_exchange_api:
+    image: ${DOCKER_REGISTRY}cmservicesexchangeapi
+    build:
+      context: .
+      dockerfile: CM.Services/CM.Services.Exchange/CM.Services.Exchange.API/Dockerfile
+    depends_on:
+      - cm_infrastracture_kong
+      - cm_infrastracture_sql
+
+  cm_services_wallet_api:
+    image: ${DOCKER_REGISTRY}cmserviceswalletapi
+    build:
+      context: .
+      dockerfile: CM.Services/CM.Services.Wallet/CM.Services.Wallet.API/Dockerfile
+    depends_on:
+      - cm_infrastracture_kong
+      - cm_infrastracture_sql
+      - cm_infrastracture_rabbitmq
+      - cm_infrastracture_kafka
+
+  cm_services_wallet_views_api:
+    image: ${DOCKER_REGISTRY}cmserviceswalletviewsapi
+    build:
+      context: .
+      dockerfile: CM.Services/CM.Services.Wallet.Views/CM.Services.Wallet.Views.Api/Dockerfile
+    depends_on:
+      - cm_infrastracture_kong
+      - cm_infrastracture_postgres
+      - cm_infrastracture_redis
+      - cm_infrastracture_rabbitmq
+      - cm_infrastracture_kafka
+  
+  cm_infrastracture_sql:
+    image: microsoft/mssql-server-linux:2017-latest
+
+  cm_infrastracture_postgres:
+    image: postgres
+
+  cm_infrastracture_kong_migration:
+    image: kong:latest
+    restart: on-failure
+    depends_on:
+      - cm_infrastracture_postgres
+
+  cm_infrastracture_kong:
+    image: kong:latest
+    restart: always
+    depends_on:
+      - cm_infrastracture_postgres
+      - cm_infrastracture_kong_migration
+
+  cm_infrastracture_rabbitmq:
+    image: rabbitmq:3-management
+
+  cm_infrastracture_redis:
+    image: redis
+
+  cm_infrastracture_zookeeper:
+    image: confluent/zookeeper
+
+  cm_infrastracture_kafka:
+    image: confluent/kafka
+    depends_on:
+      - cm_infrastracture_zookeeper
